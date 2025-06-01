@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dealer Information Portal</title>
+  <link rel="shortcut icon" href="/teletalk.png" type="image/x-icon">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #d9ffd1;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      background-color: #ffffff;
+      padding: 10px;
+    }
+    .header img {
+      max-width: 100px;
+      margin-right: 20px;
+    }
+    h1 {
+      color: #000;
+      margin: 0;
+    }
+
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+    }
+    input[type="text"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    input[type="date"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #71bd44;
+      background-color: #f0f8e3;
+    }
+
+    input[type="submit"],
+    button {
+      background-color: #71bd44;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    input[type="submit"]:hover,
+    button:hover {
+      background-color: #5fae3a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: white;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: #71bd44;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tr:hover {
+      background-color: #d1ecf1;
+    }
+
+    /* Loader */
+    #loader {
+      border: 16px solid #f3f3f3;
+      border-top: 16px solid #71bd44;
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      margin: -60px 0 0 -60px;
+      z-index: 9999;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="loader"></div>
+
+  <div class="header">
+    <img src="/teletalk.png" alt="Logo">
+    <h1>Dealer Information Portal</h1>
+  </div>
+
+  <form id="main-form" method="POST">
+    <label for="short_code">Enter Short Code:</label>
+    <input type="text" id="short_code" name="short_code" placeholder="e.g. 003326" required>
+
+    <label for="hierarchy_level">Select Hierarchy Level:</label>
+    <select id="hierarchy_level" name="hierarchy_level" required>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+
+    <label for="start_date">Start Date:</label>
+    <input type="date" id="start_date" name="start_date" required>
+
+    <label for="end_date">End Date:</label>
+    <input type="date" id="end_date" name="end_date" required>
+
+    <input type="submit" value="Submit">
+  </form>
+
+  <hr>
+
+  {% if data %}
+  <form action="/download_dealer_info" method="POST">
+    <input type="hidden" name="csv_content" value="{{ csv_data }}">
+    <input type="hidden" name="short_code" value="{{ request.form.get('short_code','') }}">
+    <button type="submit">Download CSV</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        {% for col in column_names %}
+          <th>{{ col }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in data %}
+        <tr>
+          {% for cell in row %}
+            <td>{{ cell }}</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  <script>
+    // Show loader on submit
+    document.getElementById('main-form').addEventListener('submit', () => {
+      document.getElementById("loader").style.display = "block";
+    });
+  </script>
+</body>
+</html>
